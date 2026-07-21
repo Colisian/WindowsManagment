@@ -2362,7 +2362,6 @@ if ($manufacturer -like "*Dell*")
     ##Stop Running Processes
 
     $processnames = @(
-        "DellEnterpriseClientFrameworkSubAgent.exe",
         "DellOptimizer.exe",
         "DellOptimizer.Systray.exe",
         "DellPair.exe",
@@ -3898,6 +3897,14 @@ if ($runTime.TotalHours -ge 1)
 
 write-output "Completed"
 write-output "Total Script $($runTimeFormatted)"
+
+##Write completion tag for Intune Win32 detection. Bump $debloatVersion whenever you want all devices to re-run.
+$debloatVersion = "2026.07.20"
+$tagPath = "HKLM:\SOFTWARE\Debloat"
+if (-not (Test-Path $tagPath)) { New-Item -Path $tagPath -Force | Out-Null }
+New-ItemProperty -Path $tagPath -Name "Version" -Value $debloatVersion -PropertyType String -Force | Out-Null
+New-ItemProperty -Path $tagPath -Name "RunDate" -Value (Get-Date -Format "yyyy-MM-dd HH:mm:ss") -PropertyType String -Force | Out-Null
+write-output "Wrote completion tag: $tagPath\Version = $debloatVersion"
 
 #Set ProgressPreerence back
 $ProgressPreference = $OrginalProgressPreference
